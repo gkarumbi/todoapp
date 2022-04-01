@@ -1,6 +1,11 @@
 from django.shortcuts import render,redirect
 from .models import TodoList, Category
 
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from .serializers import CategorySerializer, TodoListSerializer
+
 def index(request): #the index view
     todos = TodoList.objects.all() #quering all todos with the object manager
     categories = Category.objects.all() #getting all categories with object manager
@@ -19,3 +24,15 @@ def index(request): #the index view
                 todo = TodoList.objects.get(id=int(todo_id)) #getting todo id
                 todo.delete() #deleting todo
     return render(request, "index.html", {"todos": todos, "categories":categories})
+
+class CategoryListAPIView(APIView):
+    def get(self, request,format=None):
+        all_categories = Category.objects.all()
+        serializers = CategorySerializer(all_categories,many=True)
+        return Response(serializers.data)
+
+class TodoListAPIView(APIView):
+    def get(self, request,format=None):
+        all_todolists = TodoList.objects.all()
+        serializers = TodoListSerializer(all_todolists,many=True)
+        return Response(serializers.data)
